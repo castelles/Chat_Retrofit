@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Chat_Retrofit</string>
+    <string name="sendBtt">Enviar</string>
 </resources>

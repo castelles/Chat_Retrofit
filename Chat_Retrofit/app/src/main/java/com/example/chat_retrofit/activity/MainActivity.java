@@ -22,14 +22,18 @@ public class MainActivity extends AppCompatActivity {
     private EditText messageField;
     private Button sendBtt;
 
+    private ListView messageList;
+    private List<MessageRetro> messages;
+    private ChatService chatService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ListView messageList = findViewById(R.id.messagesList);
+        messageList = findViewById(R.id.messagesList);
 
-        List<MessageRetro> messages = Arrays.asList(new MessageRetro("Blá Blá Blá",1),new MessageRetro("Blá Blá Blá Blá",2));
+        messages = Arrays.asList(new MessageRetro("Blá Blá Blá",1),new MessageRetro("Blá Blá Blá Blá",2));
 
         MessageAdapter adapter = new MessageAdapter(messages,this,clientId);
 
@@ -38,12 +42,24 @@ public class MainActivity extends AppCompatActivity {
         sendBtt = findViewById(R.id.sendBtt);
         messageField = findViewById(R.id.messageField);
 
+        chatService = new ChatService(this);
+        chatService.receive();
+
         sendBtt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new ChatService().send(new MessageRetro(messageField.getText().toString(),3));
+               chatService.send(new MessageRetro(messageField.getText().toString(),3));
             }
         });
 
+    }
+
+    public void putOnList(MessageRetro message) {
+        messages.add(message);
+
+        MessageAdapter adapter = new MessageAdapter(messages,this,clientId);
+        messageList.setAdapter(adapter);
+
+        chatService.receive();
     }
 }

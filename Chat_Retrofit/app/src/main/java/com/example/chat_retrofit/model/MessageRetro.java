@@ -1,7 +1,9 @@
 package com.example.chat_retrofit.model;
 
-public class MessageRetro {
+import com.google.gson.annotations.SerializedName;
 
+public class MessageRetro {
+    @SerializedName("text")
     private String text;
     private int id;
 

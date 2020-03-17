@@ -10,17 +10,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.chat_retrofit.R;
 import com.example.chat_retrofit.adapter.MessageAdapter;
+import com.example.chat_retrofit.app.ChatApplication;
 import com.example.chat_retrofit.callback.ReceiveCallback;
 import com.example.chat_retrofit.callback.SendCallback;
 import com.example.chat_retrofit.model.MessageRetro;
 import com.example.chat_retrofit.service.ChatService;
 
-import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,32 +40,34 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         messageList = findViewById(R.id.messagesList);
-
-        messages = Arrays.asList(new MessageRetro("Blá Blá Blá",1),new MessageRetro("Blá Blá Blá Blá",2));
-
-        MessageAdapter adapter = new MessageAdapter(messages,this,clientId);
-
-        messageList.setAdapter(adapter);
-
         sendBtt = findViewById(R.id.sendBtt);
         messageField = findViewById(R.id.messageField);
 
-        retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+//        messages = Arrays.asList(new MessageRetro("Blá Blá Blá",1),new MessageRetro("Blá Blá Blá Blá",2));
 
-        chatService = retrofit.create(ChatService.class);
-        Call<MessageRetro> call = chatService.receive();
-        call.enqueue(new ReceiveCallback(this));
+        putOnList(new MessageRetro("Teste Teste",3));
 
-        sendBtt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               chatService.send(new MessageRetro(messageField.getText().toString(),clientId)).enqueue(new SendCallback());
+        ChatApplication app = (ChatApplication) getApplication();
+        chatService = app.getChatService();
 
-            }
-        });
+//        retrofit = new Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//
+//        chatService = retrofit.create(ChatService.class);
+//        chatService = getChatService(retrofit);
+        receiveMessages();
+
+//        sendBtt.setOnClickListener(v -> chatService.send(new MessageRetro(messageField.getText().toString(),clientId)).enqueue(new SendCallback()));
+
+//        sendBtt.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//               chatService.send(new MessageRetro(messageField.getText().toString(),clientId)).enqueue(new SendCallback());
+//
+//            }
+//        });
 
     }
 
@@ -75,13 +76,31 @@ public class MainActivity extends AppCompatActivity {
 
         MessageAdapter adapter = new MessageAdapter(messages,this,clientId);
         messageList.setAdapter(adapter);
-
-        receiveMessages();
     }
 
     public void receiveMessages() {
         Call<MessageRetro> call = chatService.receive();
         call.enqueue(new ReceiveCallback(this));
     }
+
+    public void clickSend(View view) {
+
+        String messageToSend = messageField.getText().toString();
+        MessageRetro convertedToMessage = new MessageRetro(messageToSend,clientId);
+
+        SendCallback sendCallback = new SendCallback();
+
+        chatService.send(convertedToMessage).enqueue(sendCallback);
+    }
+
+//    public ChatService getChatService(Retrofit retrofit) {
+//        retrofit = new Retrofit.Builder()
+//                .baseUrl(BASE_URL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//        ChatService chatServiceL = retrofit.create(ChatService.class);
+//        return chatServiceL;
+//    }
+
 }
 
